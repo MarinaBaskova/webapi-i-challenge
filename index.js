@@ -11,7 +11,7 @@ server.get('/', (req, res) => {
 
 // GET Users
 
-server.get('/users', (req, res) => {
+server.get('/api/users', (req, res) => {
 	db
 		.find()
 		.then((users) => {
@@ -28,10 +28,13 @@ server.listen(8000, () => {
 
 // GET User by ID
 
-server.get('/users/:id', (req, res) => {
+server.get('/api/users/:id', (req, res) => {
+	// console.log('PARAMS', req.params);
+	// console.log(req);
 	db
 		.findById(req.params.id)
 		.then((user) => {
+			console.log(user);
 			if (user.length === 0) {
 				res.status(404).json({ message: 'The user with the specified ID does not exist.' });
 			}
@@ -39,5 +42,23 @@ server.get('/users/:id', (req, res) => {
 		})
 		.catch((err) => {
 			res.status(500).json({ error: 'The user information could not be retrieved.' });
+		});
+});
+
+// POST - create a user
+
+server.post('/api/users', (req, res) => {
+	const newUserInfo = req.body;
+	if (!newUserInfo.hasOwnProperty('name') || !newUserInfo.hasOwnProperty('bio')) {
+		res.status(400).json({ errorMessage: 'Please provide name and bio for the user.' });
+	}
+	console.log('request body: ', newUserInfo);
+	db
+		.insert(newUserInfo)
+		.then((users) => {
+			res.status(201).json(users);
+		})
+		.catch((err) => {
+			res.status(500).json({ error: 'There was an error while saving the user to the database' });
 		});
 });
