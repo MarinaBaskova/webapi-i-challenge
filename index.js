@@ -52,7 +52,6 @@ server.post('/api/users', (req, res) => {
 	if (!newUserInfo.hasOwnProperty('name') || !newUserInfo.hasOwnProperty('bio')) {
 		res.status(400).json({ errorMessage: 'Please provide name and bio for the user.' });
 	}
-	console.log('request body: ', newUserInfo);
 	db
 		.insert(newUserInfo)
 		.then((users) => {
@@ -60,5 +59,22 @@ server.post('/api/users', (req, res) => {
 		})
 		.catch((err) => {
 			res.status(500).json({ error: 'There was an error while saving the user to the database' });
+		});
+});
+
+// DELETE
+
+server.delete('/api/users/:id', (req, res) => {
+	db
+		.remove(req.params.id)
+		.then((userID) => {
+			console.log('DELETE', userID);
+			if (!userID) {
+				res.status(404).json({ message: 'The user with the specified ID does not exist.' });
+			}
+			res.status(204).end();
+		})
+		.catch((err) => {
+			res.status(500).json({ error: 'The user could not be removed' });
 		});
 });
